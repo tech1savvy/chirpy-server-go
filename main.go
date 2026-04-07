@@ -46,8 +46,9 @@ func main() {
 		apiCfg.middlewareMetricsInc(
 			http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))))
 
-	mux.HandleFunc("/metrics", apiCfg.handlerGetMetrics)
-	mux.HandleFunc("/reset", apiCfg.handlerResetMetrics)
+	mux.HandleFunc("GET /healthz", handlerReadiness)
+	mux.HandleFunc("GET /metrics", apiCfg.handlerGetMetrics)
+	mux.HandleFunc("POST /reset", apiCfg.handlerResetMetrics)
 
 	wrappedMux := middlewareLog(mux)
 
