@@ -22,9 +22,9 @@ func main() {
 		http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))))
 	mux.Handle("/app/", fsHandler)
 
-	mux.HandleFunc("GET /healthz", handlerReadiness)
-	mux.HandleFunc("GET /metrics", apiCfg.handlerGetMetrics)
-	mux.HandleFunc("POST /reset", apiCfg.handlerResetMetrics)
+	mux.HandleFunc("GET /api/healthz", handlerReadiness)
+	mux.HandleFunc("GET /api/metrics", apiCfg.handlerGetMetrics)
+	mux.HandleFunc("POST /api/reset", apiCfg.handlerResetMetrics)
 
 	wrappedMux := middlewareLog(mux)
 
