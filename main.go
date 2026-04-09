@@ -23,8 +23,9 @@ func main() {
 	mux.Handle("/app/", fsHandler)
 
 	mux.HandleFunc("GET /api/healthz", handlerReadiness)
-	mux.HandleFunc("GET /api/metrics", apiCfg.handlerGetMetrics)
-	mux.HandleFunc("POST /api/reset", apiCfg.handlerResetMetrics)
+
+	mux.HandleFunc("GET /admin/metrics", apiCfg.handlerGetMetrics)
+	mux.HandleFunc("POST /admin/reset", apiCfg.handlerResetMetrics)
 
 	wrappedMux := middlewareLog(mux)
 
