@@ -26,6 +26,7 @@ func main() {
 
 	mux.HandleFunc("GET /admin/metrics", apiCfg.handlerGetMetrics)
 	mux.HandleFunc("POST /admin/reset", apiCfg.handlerResetMetrics)
+	mux.HandleFunc("POST /api/validate_chirp", handlerChirpsValidate)
 
 	wrappedMux := middlewareLog(mux)
 
