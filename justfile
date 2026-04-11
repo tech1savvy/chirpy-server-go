@@ -1,3 +1,5 @@
+set dotenv-load := true
+
 test:
     go test -v ./...
 
@@ -14,5 +16,10 @@ tidy:
     go mod tidy
 
 psql:
-    set -a && . ./.env && psql
+    psql
 
+migrate-up:
+    goose up
+
+migrate-down:
+    goose down
