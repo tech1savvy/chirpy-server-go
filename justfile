@@ -1,5 +1,8 @@
 set dotenv-load := true
 
+env:
+  set -a && source ./.env
+
 test:
     go test -v ./...
 
