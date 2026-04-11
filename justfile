@@ -1,7 +1,5 @@
-set dotenv-load := true
-
 env:
-  set -a && source ./.env
+  source ./.env
 
 test:
     go test -v ./...
@@ -17,12 +15,3 @@ lint:
 
 tidy:
     go mod tidy
-
-psql:
-    psql
-
-migrate-up:
-    goose up
-
-migrate-down:
-    goose down
