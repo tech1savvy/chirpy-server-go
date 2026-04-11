@@ -12,3 +12,7 @@ lint:
 
 tidy:
     go mod tidy
+
+psql:
+    set -a && . ./.env && psql
+
