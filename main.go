@@ -1,22 +1,35 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
+	"os"
 	"sync/atomic"
+
+	"github.com/chirpy-server-go/internal/database"
+	_ "github.com/lib/pq"
 )
 
 type apiConfig struct {
 	fileserverHits atomic.Int32
+	dbQueries      *database.Queries
 }
 
 func main() {
+	apiCfg := apiConfig{}
+
+	dbURL := os.Getenv("DB_URL")
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Printf("Error connecting to database: %v", err)
+	}
+	apiCfg.dbQueries = database.New(db)
+
 	const filepathRoot = "."
 	const port = "8080"
 
 	mux := http.NewServeMux()
-
-	apiCfg := apiConfig{}
 
 	fsHandler := apiCfg.middlewareMetricsInc(
 		http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot))))
