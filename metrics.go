@@ -22,10 +22,3 @@ func (cfg *apiConfig) handlerGetMetrics(w http.ResponseWriter, r *http.Request) 
   </body>
 </html>`, cfg.fileserverHits.Load())))
 }
-
-func (cfg *apiConfig) handlerResetMetrics(w http.ResponseWriter, r *http.Request) {
-	cfg.fileserverHits.Store(0)
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Hits reset to 0"))
-}

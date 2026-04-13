@@ -7,3 +7,4 @@ gen_random_uuid(),
   $1
 )
 RETURNING *;
+
