@@ -1,6 +1,3 @@
-env:
-  source ./.env
-
 test:
     go test -v ./...
 
