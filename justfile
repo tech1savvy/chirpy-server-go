@@ -12,3 +12,6 @@ lint:
 
 tidy:
     go mod tidy
+
+bruno:
+    cd bruno && bru run . --env Local
