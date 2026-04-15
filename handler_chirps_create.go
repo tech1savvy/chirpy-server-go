@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/chirpy-server-go/internal/database"
 	"github.com/google/uuid"
@@ -22,15 +24,14 @@ func (cfg *apiConfig) handlerChirpsCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	const maxChirpLength = 140
-	validitiy := len(params.Body) <= maxChirpLength
-
-	if !validitiy {
-		respondWithError(w, http.StatusBadRequest, "Chirp is too long", nil)
+	validChirp, err := validateChirp(params.Body)
+	if err != nil {
+		respondWithError(w, http.StatusBadRequest, err.Error(), err)
+		return
 	}
 
 	dbChirp, err := cfg.db.CreateChirp(r.Context(), database.CreateChirpParams{
-		Body:   params.Body,
+		Body:   validChirp,
 		UserID: params.UserID,
 	})
 	if err != nil {
@@ -46,4 +47,31 @@ func (cfg *apiConfig) handlerChirpsCreate(w http.ResponseWriter, r *http.Request
 	}
 
 	respondWithJSON(w, http.StatusCreated, chirp)
+}
+
+func validateChirp(body string) (string, error) {
+	const maxChirpLength = 140
+	if len(body) > maxChirpLength {
+		return "", errors.New("Chirp is too long")
+	}
+
+	badWords := map[string]struct{}{
+		"kerfuffle": {},
+		"sharbert":  {},
+		"fornax":    {},
+	}
+
+	cleaned := removeBadWords(body, badWords)
+	return cleaned, nil
+}
+
+func removeBadWords(chirp string, badWords map[string]struct{}) string {
+	chirpWords := strings.Split(chirp, " ")
+	for i := range chirpWords {
+		if _, ok := badWords[strings.ToLower(chirpWords[i])]; ok {
+			chirpWords[i] = "****"
+		}
+	}
+
+	return strings.Join(chirpWords, " ")
 }
