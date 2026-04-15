@@ -7,6 +7,12 @@ import (
 )
 
 func TestRemoveBadWords(t *testing.T) {
+	badWords := map[string]struct{}{
+		"kerfuffle": {},
+		"sharbert":  {},
+		"fornax":    {},
+	}
+
 	tests := map[string]struct {
 		chirp string
 		want  string
@@ -27,7 +33,7 @@ func TestRemoveBadWords(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			got := removeBadWords(tc.chirp)
+			got := removeBadWords(tc.chirp, badWords)
 			diff := cmp.Diff(tc.want, got)
 			if diff != "" {
 				t.Error(diff)
