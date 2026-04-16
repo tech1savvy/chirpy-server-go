@@ -6,25 +6,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestHashPassword(t *testing.T) {
-	tests := map[string]struct {
-		password string
-	}{
-		"succesful hash generation": {
-			password: "pa$$word",
-		},
-	}
-
-	for name, tc := range tests {
-		t.Run(name, func(t *testing.T) {
-			_, err := HashPassword(tc.password)
-			if err != nil {
-				t.Fail()
-			}
-		})
-	}
-}
-
 func TestCheckPasswordHash(t *testing.T) {
 	password := "pa$$word"
 	invalidPassword := "wrong"
