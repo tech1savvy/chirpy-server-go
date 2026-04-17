@@ -15,3 +15,6 @@ tidy:
 
 bruno:
     cd bruno && bru run . --env Local
+
+db:
+  docker compose up -d
