@@ -35,7 +35,7 @@ func TestCheckPasswordHash(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			got, err := CheckPasswordHash(tc.password, tc.hashedPassword)
 			if err != nil {
-				t.Fail()
+				t.Fatal(err)
 			}
 			diff := cmp.Diff(tc.want, got)
 			if diff != "" {
