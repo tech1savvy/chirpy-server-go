@@ -73,3 +73,48 @@ func TestValidateJWT(t *testing.T) {
 	}
 }
 
+func TestGetBearerToken(t *testing.T) {
+	tests := map[string]struct {
+		headers http.Header
+		want    string
+		wantErr bool
+	}{
+		"valid": {
+			headers: http.Header{
+				"Authorization": []string{"Bearer TOKEN_STRING"},
+			},
+			want:    "TOKEN_STRING",
+			wantErr: false,
+		},
+		"not-set": {
+			headers: http.Header{},
+			wantErr: true,
+		},
+		"malformed": {
+			headers: http.Header{
+				"Authorization": []string{"InvalidBearer TOKEN_STRING"},
+			},
+			wantErr: true,
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := GetBearerToken(tc.headers)
+			if !tc.wantErr {
+				if err != nil {
+					t.Fatal(err)
+				}
+			} else {
+				if err == nil {
+					t.Fatal("expected error got nil")
+				}
+				return
+			}
+
+			if diff := cmp.Diff(tc.want, got); diff != "" {
+				t.Error(diff)
+			}
+		})
+	}
+}
