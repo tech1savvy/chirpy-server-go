@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/chirpy-server-go/internal/auth"
+	"github.com/chirpy-server-go/internal/database"
 )
 
 func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
-		Email            string `json:"email"`
-		Password         string `json:"Password"`
-		ExpiresInSeconds int    `json:"expires_in_seconds,omitempty"`
+		Email    string `json:"email"`
+		Password string `json:"Password"`
 	}
 
 	type returnValues struct {
@@ -28,11 +28,6 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Cloudn't decode parameters", err)
 		return
-	}
-
-	expirationTime := time.Hour
-	if params.ExpiresInSeconds > 0 && params.ExpiresInSeconds < 60*60 {
-		expirationTime = time.Duration(params.ExpiresInSeconds) * time.Second
 	}
 
 	// Authenticate
@@ -54,9 +49,21 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// JWT
-	accessToken, err := auth.MakeJWT(dbUser.ID, cfg.jwtSecret, expirationTime)
+	accessToken, err := auth.MakeJWT(dbUser.ID, cfg.jwtSecret, time.Hour)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "failed to create access token", err)
+		return
+	}
+
+	// Referesh Token
+	refreshToken := auth.MakeRefreshToken()
+	err = cfg.db.CreateRefreshToken(r.Context(), database.CreateRefreshTokenParams{
+		Token:     refreshToken,
+		UserID:    dbUser.ID,
+		ExpiresAt: time.Now().UTC().Add(60 * 24 * time.Hour),
+	})
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "failed to save refresh token", err)
 		return
 	}
 
@@ -67,6 +74,7 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 			UpdateAt:  dbUser.UpdatedAt.Time,
 			Email:     dbUser.Email,
 		},
-		Token: accessToken,
+		Token:         accessToken,
+		RefereshToken: refreshToken,
 	})
 }
