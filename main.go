@@ -73,6 +73,7 @@ func main() {
 
 	mux.HandleFunc("GET /api/chirps", apiCfg.handlerChirpsRetreive)
 	mux.HandleFunc("GET /api/chirps/{chirpID}", apiCfg.handlerRetreiveChirpByID)
+	mux.HandleFunc("DELETE /api/chirps/{chirpID}", apiCfg.handleChirpsDelete)
 	mux.HandleFunc("POST /api/chirps", apiCfg.handlerChirpsCreate)
 
 	wrappedMux := middlewareLog(mux)
