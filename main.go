@@ -76,6 +76,8 @@ func main() {
 	mux.HandleFunc("DELETE /api/chirps/{chirpID}", apiCfg.handleChirpsDelete)
 	mux.HandleFunc("POST /api/chirps", apiCfg.handlerChirpsCreate)
 
+	mux.HandleFunc("POST /api/polka/webhooks", apiCfg.handlerPolkaWebhooks)
+
 	wrappedMux := middlewareLog(mux)
 
 	srv := &http.Server{

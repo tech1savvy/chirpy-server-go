@@ -58,10 +58,11 @@ func (cfg *apiConfig) handlerUsersUpdate(w http.ResponseWriter, r *http.Request)
 
 	respondWithJSON(w, http.StatusOK, returnVaules{
 		User{
-			ID:        user.ID,
-			Email:     user.Email,
-			CreatedAt: user.CreatedAt.Time,
-			UpdateAt:  user.UpdatedAt.Time,
+			ID:          user.ID,
+			Email:       user.Email,
+			CreatedAt:   user.CreatedAt.Time,
+			UpdateAt:    user.UpdatedAt.Time,
+			IsChirpyRed: user.IsChirpyRed,
 		},
 	})
 }
