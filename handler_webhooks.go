@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/chirpy-server-go/internal/auth"
 	"github.com/google/uuid"
 )
 
@@ -17,10 +18,22 @@ func (cfg *apiConfig) handlerPolkaWebhooks(w http.ResponseWriter, r *http.Reques
 			UserID string `json:"user_id"`
 		} `json:"data"`
 	}
+
+	// Auth
+	apiKey, err := auth.GetAPIKey(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "Cloudn't get api key", err)
+		return
+	}
+	if apiKey != cfg.apiKey {
+		respondWithError(w, http.StatusUnauthorized, "Invalid api key", err)
+		return
+	}
+
 	// Decode parameters
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
-	err := decoder.Decode(&params)
+	err = decoder.Decode(&params)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "Cloudn't decode parameters", err)
 		return
