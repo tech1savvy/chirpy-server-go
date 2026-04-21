@@ -4,13 +4,25 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/chirpy-server-go/internal/database"
 	"github.com/google/uuid"
 )
 
 func (cfg *apiConfig) handlerChirpsRetreive(w http.ResponseWriter, r *http.Request) {
-	dbChirps, err := cfg.db.GetChirps(r.Context())
+	authorID, err := authorIDFromRequst(r)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Cloudn't retrieve chirps", err)
+		respondWithError(w, http.StatusBadRequest, "Invalid authorID", err)
+	}
+
+	var dbChirps []database.Chirp
+
+	if authorID != uuid.Nil {
+		dbChirps, err = cfg.db.GetChirpByAuthor(r.Context(), authorID)
+	} else {
+		dbChirps, err = cfg.db.GetChirps(r.Context())
+	}
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "Couldn't retrieve chirps", err)
 		return
 	}
 
@@ -26,6 +38,19 @@ func (cfg *apiConfig) handlerChirpsRetreive(w http.ResponseWriter, r *http.Reque
 	}
 
 	respondWithJSON(w, http.StatusOK, chirps)
+}
+
+func authorIDFromRequst(r *http.Request) (uuid.UUID, error) {
+	authorIDString := r.URL.Query().Get("author_id")
+	if authorIDString == "" {
+		return uuid.UUID{}, nil
+	}
+
+	authorID, err := uuid.Parse(authorIDString)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return authorID, nil
 }
 
 func (cfg *apiConfig) handlerRetreiveChirpByID(w http.ResponseWriter, r *http.Request) {
